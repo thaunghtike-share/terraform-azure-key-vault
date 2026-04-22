@@ -5,7 +5,7 @@
 ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)
 
 ## 📌 Project Overview
-This repository manages the lifecycle of application environment variables for the **MBR Project** infrastructure. It automates the synchronization of local `.env` files into **Azure Key Vault** using Terraform and ensures that updates are live-reloaded into **Azure Kubernetes Service (AKS)** pods without manual intervention.
+This repository manages the lifecycle of application environment variables for **Our Client** infrastructure. It automates the synchronization of local `.env` files into **Azure Key Vault** using Terraform and ensures that updates are live-reloaded into **Azure Kubernetes Service (AKS)** pods without manual intervention.
 
 ## ⚙️ Architecture & Flow
 
