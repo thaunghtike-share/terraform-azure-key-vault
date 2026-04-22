@@ -1,14 +1,14 @@
-tenant_id              = "6260daf3-8575-4ac3-bec1-844ebcae1c64"
-current_user_object_id = "150009c0-8c6d-4d23-89db-e8a77c730700"
+tenant_id              = "6xxxxxxx"
+current_user_object_id = "15xxxxx"
 
 envs = {
   dev = {
-    kv_name = "mbr-kv-dev"
+    kv_name = "aks-kv-dev"
   }
   uat = {
-    kv_name = "mbr-kv-uat"
+    kv_name = "aks-kv-uat"
   }
   production = {
-    kv_name = "mbr-kv-production"
+    kv_name = "aks-kv-production"
   }
 }
