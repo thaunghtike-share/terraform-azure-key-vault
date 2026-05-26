@@ -1,0 +1,90 @@
+name: Create Azure Key Vault and Upload Secrets
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform:
+    name: create-azure-key-vault-and-upload-secrets
+    runs-on: ubuntu-latest
+
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+      ARM_USE_OIDC: true
+      ARM_USE_AZUREAD: true
+
+      TF_VAR_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+      TF_VAR_aks_keyvault_csi_object_id: ${{ secrets.AKS_KEYVAULT_CSI_OBJECT_ID }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -out=main.tfplan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve main.tfplan
+
+      - name: Upload Secrets To Azure Key Vault
+        env:
+          DEV_EXCHANGE_BACKEND_ENV: ${{ secrets.DEV_EXCHANGE_BACKEND_ENV }}
+          DEV_MBR_GREY_BACKEND_ENV: ${{ secrets.DEV_MBR_GREY_BACKEND_ENV }}
+          DEV_MBR_INTEGRATION_ENV: ${{ secrets.DEV_MBR_INTEGRATION_ENV }}
+          DEV_MBR_OPERATION_ENV: ${{ secrets.DEV_MBR_OPERATION_ENV }}
+
+          UAT_EXCHANGE_BACKEND_ENV: ${{ secrets.UAT_EXCHANGE_BACKEND_ENV }}
+          UAT_MBR_GREY_BACKEND_ENV: ${{ secrets.UAT_MBR_GREY_BACKEND_ENV }}
+          UAT_MBR_INTEGRATION_ENV: ${{ secrets.UAT_MBR_INTEGRATION_ENV }}
+          UAT_MBR_OPERATION_ENV: ${{ secrets.UAT_MBR_OPERATION_ENV }}
+
+          PRODUCTION_EXCHANGE_BACKEND_ENV: ${{ secrets.PRODUCTION_EXCHANGE_BACKEND_ENV }}
+          PRODUCTION_INTEGRATION_ENV: ${{ secrets.PRODUCTION_INTEGRATION_ENV }}
+          PRODUCTION_MBR_GREY_BACKEND_ENV: ${{ secrets.PRODUCTION_MBR_GREY_BACKEND_ENV }}
+          PRODUCTION_RRS_BACKEND_ENV: ${{ secrets.PRODUCTION_RRS_BACKEND_ENV }}
+
+        run: |
+          jq -c '.[]' secrets-map.json | while read item; do
+            VAULT=$(echo "$item" | jq -r '.vault')
+            SECRET_NAME=$(echo "$item" | jq -r '.secretName')
+            GITHUB_SECRET=$(echo "$item" | jq -r '.githubSecret')
+
+            SECRET_VALUE="${!GITHUB_SECRET}"
+
+            if [ -z "$SECRET_VALUE" ]; then
+              echo "Missing GitHub secret: $GITHUB_SECRET"
+              exit 1
+            fi
+
+            echo "Uploading secret: $SECRET_NAME to vault: $VAULT"
+
+            az keyvault secret set \
+              --vault-name "$VAULT" \
+              --name "$SECRET_NAME" \
+              --value "$SECRET_VALUE" \
+              --output none
+          done
