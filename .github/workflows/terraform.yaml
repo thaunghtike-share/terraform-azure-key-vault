@@ -52,20 +52,14 @@ jobs:
 
       - name: Upload Secrets To Azure Key Vault
         env:
-          DEV_EXCHANGE_BACKEND_ENV: ${{ secrets.DEV_EXCHANGE_BACKEND_ENV }}
-          DEV_MBR_GREY_BACKEND_ENV: ${{ secrets.DEV_MBR_GREY_BACKEND_ENV }}
-          DEV_MBR_INTEGRATION_ENV: ${{ secrets.DEV_MBR_INTEGRATION_ENV }}
-          DEV_MBR_OPERATION_ENV: ${{ secrets.DEV_MBR_OPERATION_ENV }}
+          DEV_APP1_ENV: ${{ secrets.DEV_APP1_ENV }}
+          DEV_APP2_ENV: ${{ secrets.DEV_APP2_ENV }}
 
-          UAT_EXCHANGE_BACKEND_ENV: ${{ secrets.UAT_EXCHANGE_BACKEND_ENV }}
-          UAT_MBR_GREY_BACKEND_ENV: ${{ secrets.UAT_MBR_GREY_BACKEND_ENV }}
-          UAT_MBR_INTEGRATION_ENV: ${{ secrets.UAT_MBR_INTEGRATION_ENV }}
-          UAT_MBR_OPERATION_ENV: ${{ secrets.UAT_MBR_OPERATION_ENV }}
+          UAT_APP1_ENV: ${{ secrets.UAT_APP1_ENV }}
+          UAT_APP2_ENV: ${{ secrets.UAT_APP2_ENV }}
 
-          PRODUCTION_EXCHANGE_BACKEND_ENV: ${{ secrets.PRODUCTION_EXCHANGE_BACKEND_ENV }}
-          PRODUCTION_INTEGRATION_ENV: ${{ secrets.PRODUCTION_INTEGRATION_ENV }}
-          PRODUCTION_MBR_GREY_BACKEND_ENV: ${{ secrets.PRODUCTION_MBR_GREY_BACKEND_ENV }}
-          PRODUCTION_RRS_BACKEND_ENV: ${{ secrets.PRODUCTION_RRS_BACKEND_ENV }}
+          PRODUCTION_APP1_ENV: ${{ secrets.PRODUCTION_APP1_ENV }}
+          PRODUCTION_APP2_ENV: ${{ secrets.PRODUCTION_APP2_ENV }}
 
         run: |
           jq -c '.[]' secrets-map.json | while read item; do

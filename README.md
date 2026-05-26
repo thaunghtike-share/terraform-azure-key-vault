@@ -331,9 +331,9 @@ Application `.env` values are stored securely inside GitHub Actions Secrets.
 Example:
 
 ```text
-DEV_EXCHANGE_BACKEND_ENV
-UAT_EXCHANGE_BACKEND_ENV
-PRODUCTION_EXCHANGE_BACKEND_ENV
+DEV_APP1_ENV
+UAT_APP1_ENV
+PRODUCTION_APP1_ENV
 ```
 
 Each GitHub Secret contains full `.env` file content.
@@ -345,7 +345,7 @@ Each GitHub Secret contains full `.env` file content.
 ## terraform-deploy.yml
 
 ```yaml
-name: Terraform Deploy
+name: Create Azure Key Vault and Upload Secrets
 
 on:
   push:
@@ -357,7 +357,7 @@ permissions:
 
 jobs:
   terraform:
-    name: Terraform Plan & Apply
+    name: create-azure-key-vault-and-upload-secrets
     runs-on: ubuntu-latest
 
     env:
@@ -399,20 +399,14 @@ jobs:
 
       - name: Upload Secrets To Azure Key Vault
         env:
-          DEV_EXCHANGE_BACKEND_ENV: ${{ secrets.DEV_EXCHANGE_BACKEND_ENV }}
-          DEV_MBR_GREY_BACKEND_ENV: ${{ secrets.DEV_MBR_GREY_BACKEND_ENV }}
-          DEV_MBR_INTEGRATION_ENV: ${{ secrets.DEV_MBR_INTEGRATION_ENV }}
-          DEV_MBR_OPERATION_ENV: ${{ secrets.DEV_MBR_OPERATION_ENV }}
+          DEV_APP1_ENV: ${{ secrets.DEV_APP1_ENV }}
+          DEV_APP2_ENV: ${{ secrets.DEV_APP2_ENV }}
 
-          UAT_EXCHANGE_BACKEND_ENV: ${{ secrets.UAT_EXCHANGE_BACKEND_ENV }}
-          UAT_MBR_GREY_BACKEND_ENV: ${{ secrets.UAT_MBR_GREY_BACKEND_ENV }}
-          UAT_MBR_INTEGRATION_ENV: ${{ secrets.UAT_MBR_INTEGRATION_ENV }}
-          UAT_MBR_OPERATION_ENV: ${{ secrets.UAT_MBR_OPERATION_ENV }}
+          UAT_APP1_ENV: ${{ secrets.UAT_APP1_ENV }}
+          UAT_APP2_ENV: ${{ secrets.UAT_APP2_ENV }}
 
-          PRODUCTION_EXCHANGE_BACKEND_ENV: ${{ secrets.PRODUCTION_EXCHANGE_BACKEND_ENV }}
-          PRODUCTION_INTEGRATION_ENV: ${{ secrets.PRODUCTION_INTEGRATION_ENV }}
-          PRODUCTION_MBR_GREY_BACKEND_ENV: ${{ secrets.PRODUCTION_MBR_GREY_BACKEND_ENV }}
-          PRODUCTION_RRS_BACKEND_ENV: ${{ secrets.PRODUCTION_RRS_BACKEND_ENV }}
+          PRODUCTION_APP1_ENV: ${{ secrets.PRODUCTION_APP1_ENV }}
+          PRODUCTION_APP2_ENV: ${{ secrets.PRODUCTION_APP2_ENV }}
 
         run: |
           jq -c '.[]' secrets-map.json | while read item; do
@@ -448,25 +442,6 @@ AZURE_CLIENT_ID
 AZURE_TENANT_ID
 AZURE_SUBSCRIPTION_ID
 AKS_KEYVAULT_CSI_OBJECT_ID
-```
-
-Application Secrets:
-
-```text
-DEV_EXCHANGE_BACKEND_ENV
-DEV_MBR_GREY_BACKEND_ENV
-DEV_MBR_INTEGRATION_ENV
-DEV_MBR_OPERATION_ENV
-
-UAT_EXCHANGE_BACKEND_ENV
-UAT_MBR_GREY_BACKEND_ENV
-UAT_MBR_INTEGRATION_ENV
-UAT_MBR_OPERATION_ENV
-
-PRODUCTION_EXCHANGE_BACKEND_ENV
-PRODUCTION_INTEGRATION_ENV
-PRODUCTION_MBR_GREY_BACKEND_ENV
-PRODUCTION_RRS_BACKEND_ENV
 ```
 
 Each application secret contains the full `.env` file content.
